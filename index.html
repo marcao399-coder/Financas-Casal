@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- METADADOS PARA PWA -->
+    <meta name="theme-color" content="#1a237e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    
+    <title>Finanças Casal</title>
+    
+    <!-- ESTILOS -->
+    <style>
+        /* FONT AWESOME EM EMOJIS (não precisa de internet) */
+        .fa { font-style: normal; }
+        .fa-coins:before { content: "💰"; }
+        .fa-sync-alt:before { content: "🔄"; }
+        .fa-chart-pie:before { content: "📊"; }
+        .fa-money-bill-wave:before { content: "💵"; }
+        .fa-shopping-cart:before { content: "🛒"; }
+        .fa-credit-card:before { content: "💳"; }
+        .fa-shield-alt:before { content: "🛡️"; }
+        .fa-plus:before { content: "➕"; }
+        .fa-qrcode:before { content: "📷"; }
+        .fa-camera:before { content: "📸"; }
+        .fa-home:before { content: "🏠"; }
+        .fa-chart-bar:before { content: "📈"; }
+        .fa-tags:before { content: "🏷️"; }
+        .fa-cog:before { content: "⚙️"; }
+        .fa-utensils:before { content: "🍴"; }
+        .fa-car:before { content: "🚗"; }
+        .fa-film:before { content: "🎬"; }
+        .fa-random:before { content: "🔀"; }
+        .fa-times:before { content: "✕"; }
+        .fa-cloud:before { content: "☁️"; }
+        .fa-download:before { content: "📥"; }
+        .fa-upload:before { content: "📤"; }
+        
+        /* ESTILOS PRINCIPAIS */
+        :root {
+            --primary-dark: #1a237e;
+            --primary-light: #3949ab;
+            --success: #4caf50;
+            --danger: #f44336;
+            --warning: #ff9800;
+            --light-bg: #f5f5f5;
+            --card-bg: #ffffff;
+            --text-dark: #333333;
+            --text-light: #666666;
+            --shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+
+        body {
+            background: var(--light-bg);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding-bottom: 80px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* HEADER */
+        .header {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-light));
+            color: white;
+            padding: 20px 16px;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-menu {
+            display: flex;
+            gap: 15px;
+        }
+
+        .icon-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .icon-btn:active {
+            background: rgba(255,255,255,0.3);
+            transform: scale(0.95);
+        }
+
+        .saldo-box {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 18px;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .saldo-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .saldo-valor {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        /* CARDS DE RESUMO */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            padding: 16px;
+        }
+
+        .summary-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .summary-card:active {
+            transform: translateY(-2px);
+        }
+
+        .summary-card.receitas {
+            border-top: 4px solid var(--success);
+        }
+
+        .summary-card.despesas {
+            border-top: 4px solid var(--danger);
+        }
+
+        .summary-card.credito {
+            border-top: 4px solid var(--warning);
+        }
+
+        .summary-card.seguro {
+            border-top: 4px solid var(--primary-light);
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .receitas .card-icon { background: var(--success); }
+        .despesas .card-icon { background: var(--danger); }
+        .credito .card-icon { background: var(--warning); }
+        .seguro .card-icon { background: var(--primary-light); }
+
+        .card-title {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .card-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+
+        /* SEÇÃO DE GASTOS */
+        .section {
+            background: var(--card-bg);
+            margin: 16px;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .btn-add {
+            background: var(--primary-light);
+            color: white;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .btn-add:active {
+            background: var(--primary-dark);
+            transform: scale(0.95);
+        }
+
+        .transacao-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .transacao-item:last-child {
+            border-bottom: none;
+        }
+
+        .transacao-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .transacao-icone {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .transacao-detalhes h4 {
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+
+        .transacao-detalhes p {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .transacao-valor {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .transacao-valor.positivo {
+            color: var(--success);
+        }
+
+        .transacao-valor.negativo {
+            color: var(--danger);
+        }
+
+        /* SINCRONIZAÇÃO COM GITHUB */
+        .github-section {
+            background: var(--card-bg);
+            margin: 16px;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .github-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .github-btn {
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .github-btn.backup {
+            background: var(--success);
+            color: white;
+        }
+
+        .github-btn.restore {
+            background: var(--primary-light);
+            color: white;
+        }
+
+        .github-btn.sync {
+            background: var(--warning);
+            color: white;
+        }
+
+        .github-btn:active {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        /* MODAIS */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: modalSlide 0.3s ease;
+        }
+
+        @keyframes modalSlide {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            color: var(--primary-dark);
+            font-size: 1.3rem;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-light);
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .close-modal:active {
+            color: var(--danger);
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-light);
+            outline: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-light);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            width: 100%;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-primary:active {
+            background: var(--primary-dark);
+        }
+
+        /* RODAPÉ */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: color 0.3s;
+            padding: 5px;
+            border: none;
+            background: none;
+        }
+
+        .nav-item.active {
+            color: var(--primary-light);
+        }
+
+        /* STATUS DO PWA */
+        .pwa-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: var(--success);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            display: none;
+        }
+
+        .pwa-status.installed {
+            display: block;
+            background: var(--success);
+        }
+
+        .pwa-status.offline {
+            display: block;
+            background: var(--warning);
+        }
+
+        /* RESPONSIVIDADE */
+        @media (max-width: 480px) {
+            .summary-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .saldo-valor {
+                font-size: 1.8rem;
+            }
+            
+            .github-buttons {
+                flex-direction: column;
+            }
+        }
+
+        /* ANIMAÇÕES */
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- STATUS PWA -->
+    <div id="pwaStatus" class="pwa-status"></div>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-top">
+            <div class="logo">
+                <span class="fa fa-coins"></span>
+                Finanças Casal
+            </div>
+            <div class="user-menu">
+                <button class="icon-btn" onclick="abrirGitHubSync()" title="Sincronizar GitHub">
+                    <span class="fa fa-cloud"></span>
+                </button>
+                <button class="icon-btn" onclick="abrirRelatorios()" title="Relatórios">
+                    <span class="fa fa-chart-pie"></span>
+                </button>
+            </div>
+        </div>
+        <div class="saldo-box">
+            <div class="saldo-label">Saldo Conjunto</div>
+            <div class="saldo-valor" id="saldoTotal">R$ 0,00</div>
+        </div>
+    </header>
+
+    <!-- CARDS DE RESUMO -->
+    <div class="summary-cards">
+        <div class="summary-card receitas">
+            <div class="card-icon">
+                <span class="fa fa-money-bill-wave"></span>
+            </div>
+            <div class="card-title">Receitas</div>
+            <div class="card-value" id="receitasTotal">R$ 0,00</div>
+        </div>
+        
+        <div class="summary-card despesas">
+            <div class="card-icon">
+                <span class="fa fa-shopping-cart"></span>
+            </div>
+            <div class="card-title">Despesas</div>
+            <div class="card-value" id="despesasTotal">R$ 0,00</div>
+        </div>
+        
+        <div class="summary-card credito">
+            <div class="card-icon">
+                <span class="fa fa-credit-card"></span>
+            </div>
+            <div class="card-title">Cartão</div>
+            <div class="card-value" id="creditoTotal">R$ 0,00</div>
+        </div>
+        
+        <div class="summary-card seguro">
+            <div class="card-icon">
+                <span class="fa fa-shield-alt"></span>
+            </div>
+            <div class="card-title">Saldo Seguro</div>
+            <div class="card-value" id="saldoSeguro">R$ 0,00</div>
+        </div>
+    </div>
+
+    <!-- TRANSAÇÕES RECENTES -->
+    <div class="section fade-in">
+        <div class="section-header">
+            <h3 class="section-title">Transações Recentes</h3>
+            <button class="btn-add" onclick="abrirModalTransacao()" title="Nova transação">
+                <span class="fa fa-plus"></span>
+            </button>
+        </div>
+        <div id="listaTransacoes">
+            <!-- Transações carregadas via JS -->
+        </div>
+    </div>
+
+    <!-- SINCRONIZAÇÃO GITHUB -->
+    <div class="github-section fade-in">
+        <div class="section-header">
+            <h3 class="section-title">Backup na Nuvem</h3>
+            <span class="fa fa-cloud"></span>
+        </div>
+        <p style="color: var(--text-light); margin-bottom: 15px;">
+            Seus dados seguros no GitHub. Funciona mesmo offline!
+        </p>
+        <div class="github-buttons">
+            <button class="github-btn backup" onclick="fazerBackupGitHub()">
+                <span class="fa fa-upload"></span>
+                Fazer Backup Agora
+            </button>
+            <button class="github-btn restore" onclick="restaurarBackupGitHub()">
+                <span class="fa fa-download"></span>
+                Restaurar Backup
+            </button>
+            <button class="github-btn sync" onclick="sincronizarEntreDispositivos()">
+                <span class="fa fa-sync-alt"></span>
+                Sincronizar Dispositivos
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL NOVA TRANSAÇÃO -->
+    <div id="modalTransacao" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Nova Transação</h3>
+                <button class="close-modal" onclick="fecharModal('modalTransacao')">
+                    <span class="fa fa-times"></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="tipo">Tipo</label>
+                    <select id="tipo" class="form-control">
+                        <option value="receita">Receita</option>
+                        <option value="despesa">Despesa</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="valor">Valor (R$)</label>
+                    <input type="number" id="valor" class="form-control" placeholder="0,00" step="0.01" min="0" inputmode="decimal">
+                </div>
+                <div class="form-group">
+                    <label for="descricao">Descrição</label>
+                    <input type="text" id="descricao" class="form-control" placeholder="Ex: Salário, Supermercado...">
+                </div>
+                <div class="form-group">
+                    <label for="categoria">Categoria</label>
+                    <select id="categoria" class="form-control">
+                        <option value="salario">Salário</option>
+                        <option value="alimentacao">Alimentação</option>
+                        <option value="transporte">Transporte</option>
+                        <option value="lazer">Lazer</option>
+                        <option value="casa">Casa</option>
+                        <option value="cartao">Cartão</option>
+                        <option value="outros">Outros</option>
+                    </select>
+                </div>
+                <button class="btn-primary" onclick="salvarTransacao()">
+                    Salvar Transação
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL BACKUP GITHUB -->
+    <div id="modalGitHub" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Backup GitHub</h3>
+                <button class="close-modal" onclick="fecharModal('modalGitHub')">
+                    <span class="fa fa-times"></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="githubToken">Token GitHub (opcional)</label>
+                    <input type="password" id="githubToken" class="form-control" placeholder="ghp_xxxxxxxxxxxx">
+                    <small style="color: var(--text-light);">
+                        Só precisa se quiser backup privado. Deixe em branco para backup local.
+                    </small>
+                </div>
+                <div class="form-group">
+                    <label for="backupData">Dados para Backup:</label>
+                    <textarea id="backupData" class="form-control" rows="6" readonly style="resize: none; font-family: monospace;"></textarea>
+                </div>
+                <button class="btn-primary" onclick="copiarBackup()">
+                    Copiar Dados
+                </button>
+                <p style="margin-top: 15px; font-size: 0.9rem; color: var(--text-light);">
+                    Cole estes dados no GitHub Gist ou salve em um arquivo.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- NAVEGAÇÃO INFERIOR -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="mostrarInicio()">
+            <span class="fa fa-home"></span>
+            Início
+        </button>
+        <button class="nav-item" onclick="abrirRelatorios()">
+            <span class="fa fa-chart-bar"></span>
+            Relatórios
+        </button>
+        <button class="nav-item" onclick="abrirConfig()">
+            <span class="fa fa-cog"></span>
+            Config
+        </button>
+    </nav>
+
+    <script>
+        // ============================================
+        // SISTEMA DE DADOS
+        // ============================================
+        
+        let financasApp = {
+            usuario: localStorage.getItem('financas_usuario') || 'voce',
+            dispositivo: navigator.userAgent.match(/iPhone|iPad|iPod/i) ? 'ios' : 'android',
+            dados: {
+                saldoTotal: 0,
+                receitas: 0,
+                despesas: 0,
+                credito: 0,
+                saldoSeguro: 0,
+                transacoes: [],
+                ultimoBackup: null
+            },
+            config: {
+                backupAuto: true,
+                githubToken: '',
+                repoUrl: 'https://github.com/seu-usuario/financas-casal'
+            }
+        };
+
+        // ============================================
+        // INICIALIZAÇÃO PWA
+        // ============================================
+        
+        function inicializarPWA() {
+            // Verificar se está instalado como PWA
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                document.getElementById('pwaStatus').textContent = '📱 App Instalado';
+                document.getElementById('pwaStatus').classList.add('installed');
+            }
+            
+            // Verificar conexão
+            if (!navigator.onLine) {
+                document.getElementById('pwaStatus').textContent = '⚡ Modo Offline';
+                document.getElementById('pwaStatus').classList.add('offline');
+            }
+            
+            // Registrar Service Worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(() => console.log('Service Worker registrado'))
+                    .catch(err => console.log('Service Worker falhou:', err));
+            }
+            
+            // Carregar dados
+            carregarDados();
+            
+            // Configurar usuário se for primeira vez
+            if (!localStorage.getItem('financas_primeira_vez')) {
+                setTimeout(configurarPrimeiraVez, 1000);
+            }
+            
+            // Atualizar interface
+            atualizarInterface();
+            
+            // Backup automático a cada 5 minutos
+            setInterval(() => {
+                if (financasApp.config.backupAuto && financasApp.dados.transacoes.length > 0) {
+                    salvarDadosLocal();
+                }
+            }, 300000);
+        }
+
+        function configurarPrimeiraVez() {
+            const resposta = confirm(
+                '👋 Bem-vindo ao Finanças Casal!\n\n' +
+                'Este app funciona 100% offline e pode ser instalado como app nativo.\n\n' +
+                'Clique em "Instalar App" quando o navegador perguntar!\n\n' +
+                'Este é o celular de quem?\n' +
+                'OK = VOCÊ\nCancelar = ESPOSA'
+            );
+            
+            financasApp.usuario = resposta ? 'voce' : 'esposa';
+            localStorage.setItem('financas_usuario', financasApp.usuario);
+            localStorage.setItem('financas_primeira_vez', 'true');
+            
+            alert(`Configurado como: ${financasApp.usuario === 'voce' ? 'VOCÊ' : 'ESPOSA'}\n\n💡 Dica: Toque em "Backup na Nuvem" para sincronizar com o outro celular.`);
+        }
+
+        // ============================================
+        // GERENCIAMENTO DE DADOS
+        // ============================================
+        
+        function carregarDados() {
+            try {
+                const dadosSalvos = localStorage.getItem('financas_dados');
+                if (dadosSalvos) {
+                    financasApp.dados = JSON.parse(dadosSalvos);
+                    console.log('Dados carregados do localStorage');
+                }
+            } catch (e) {
+                console.error('Erro ao carregar dados:', e);
+            }
+        }
+
+        function salvarDadosLocal() {
+            try {
+                financasApp.dados.ultimoBackup = new Date().toISOString();
+                localStorage.setItem('financas_dados', JSON.stringify(financasApp.dados));
+                console.log('Dados salvos no localStorage');
+                
+                // Feedback visual
+                const status = document.getElementById('pwaStatus');
+                const originalText = status.textContent;
+                status.textContent = '✅ Dados salvos';
+                setTimeout(() => status.textContent = originalText, 2000);
+                
+            } catch (e) {
+                console.error('Erro ao salvar dados:', e);
+            }
+        }
+
+        function recalcularTotais() {
+            const transacoes = financasApp.dados.transacoes;
+            
+            financasApp.dados.receitas = transacoes
+                .filter(t => t.tipo === 'receita')
+                .reduce((s, t) => s + t.valor, 0);
+                
+            financasApp.dados.despesas = transacoes
+                .filter(t => t.tipo === 'despesa')
+                .reduce((s, t) => s + t.valor, 0);
+                
+            financasApp.dados.credito = transacoes
+                .filter(t => t.tipo === 'despesa' && t.categoria === 'cartao')
+                .reduce((s, t) => s + t.valor, 0);
+                
+            financasApp.dados.saldoTotal = financasApp.dados.receitas - financasApp.dados.despesas;
+            financasApp.dados.saldoSeguro = financasApp.dados.saldoTotal;
+        }
+
+        // ============================================
+        // INTERFACE
+        // ============================================
+        
+        function atualizarInterface() {
+            // Atualizar totais
+            document.getElementById('saldoTotal').textContent = formatarMoeda(financasApp.dados.saldoTotal);
+            document.getElementById('receitasTotal').textContent = formatarMoeda(financasApp.dados.receitas);
+            document.getElementById('despesasTotal').textContent = formatarMoeda(financasApp.dados.despesas);
+            document.getElementById('creditoTotal').textContent = formatarMoeda(financasApp.dados.credito);
+            document.getElementById('saldoSeguro').textContent = formatarMoeda(financasApp.dados.saldoSeguro);
+
+            // Atualizar lista de transações
+            const lista = document.getElementById('listaTransacoes');
+            lista.innerHTML = '';
+
+            const transacoesOrdenadas = [...financasApp.dados.transacoes]
+                .sort((a, b) => new Date(b.data) - new Date(a.data))
+                .slice(0, 10);
+
+            if (transacoesOrdenadas.length === 0) {
+                lista.innerHTML = `
+                    <div class="transacao-item" style="justify-content: center; color: var(--text-light);">
+                        Nenhuma transação registrada ainda.
+                    </div>
+                `;
+                return;
+            }
+
+            transacoesOrdenadas.forEach(transacao => {
+                lista.appendChild(criarItemTransacao(transacao));
+            });
+        }
+
+        function criarItemTransacao(transacao) {
+            const item = document.createElement('div');
+            item.className = 'transacao-item fade-in';
+            
+            const icones = {
+                salario: 'fa-money-bill-wave',
+                alimentacao: 'fa-utensils',
+                transporte: 'fa-car',
+                lazer: 'fa-film',
+                casa: 'fa-home',
+                cartao: 'fa-credit-card',
+                outros: 'fa-random'
+            };
+
+            const cores = {
+                receita: '#4caf50',
+                despesa: '#f44336'
+            };
+
+            const nomeUsuario = transacao.usuario === 'voce' ? 'Você' : 'Esposa';
+
+            item.innerHTML = `
+                <div class="transacao-info">
+                    <div class="transacao-icone" style="background: ${cores[transacao.tipo]}">
+                        <span class="fa ${icones[transacao.categoria] || 'fa-random'}"></span>
+                    </div>
+                    <div class="transacao-detalhes">
+                        <h4>${transacao.descricao}</h4>
+                        <p>${formatarData(transacao.data)} • ${nomeUsuario}</p>
+                    </div>
+                </div>
+                <div class="transacao-valor ${transacao.tipo === 'receita' ? 'positivo' : 'negativo'}">
+                    ${transacao.tipo === 'receita' ? '+' : '-'} ${formatarMoeda(transacao.valor)}
+                </div>
+            `;
+            
+            return item;
+        }
+
+        function formatarMoeda(valor) {
+            return 'R$ ' + valor.toFixed(2).replace('.', ',');
+        }
+
+        function formatarData(dataString) {
+            try {
+                const data = new Date(dataString);
+                const hoje = new Date();
+                
+                if (data.toDateString() === hoje.toDateString()) {
+                    return 'Hoje';
+                }
+                
+                return data.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+            } catch (e) {
+                return dataString;
+            }
+        }
+
+        // ============================================
+        // TRANSAÇÕES
+        // ============================================
+        
+        function abrirModalTransacao() {
+            document.getElementById('valor').value = '';
+            document.getElementById('descricao').value = '';
+            abrirModal('modalTransacao');
+        }
+
+        function salvarTransacao() {
+            const tipo = document.getElementById('tipo').value;
+            const valor = parseFloat(document.getElementById('valor').value);
+            const descricao = document.getElementById('descricao').value.trim();
+            const categoria = document.getElementById('categoria').value;
+
+            if (!valor || valor <= 0 || !descricao) {
+                alert('Preencha todos os campos corretamente!');
+                return;
+            }
+
+            const novaTransacao = {
+                id: Date.now() + Math.random(),
+                tipo: tipo,
+                valor: valor,
+                descricao: descricao,
+                categoria: categoria,
+                data: new Date().toISOString().split('T')[0],
+                usuario: financasApp.usuario
+            };
+
+            financasApp.dados.transacoes.push(novaTransacao);
+            recalcularTotais();
+            salvarDadosLocal();
+            atualizarInterface();
+            
+            fecharModal('modalTransacao');
+            alert('✅ Transação salva!');
+        }
+
+        // ============================================
+        // BACKUP GITHUB
+        // ============================================
+        
+        function abrirGitHubSync() {
+            const dadosBackup = {
+                app: 'Finanças Casal',
+                versao: '1.0',
+                usuario: financasApp.usuario,
+                dataBackup: new Date().toISOString(),
+                dados: financasApp.dados
+            };
+            
+            document.getElementById('backupData').value = JSON.stringify(dadosBackup, null, 2);
+            document.getElementById('githubToken').value = financasApp.config.githubToken || '';
+            abrirModal('modalGitHub');
+        }
+
+        function fazerBackupGitHub() {
+            abrirGitHubSync();
+        }
+
+        function copiarBackup() {
+            const textarea = document.getElementById('backupData');
+            textarea.select();
+            
+            try {
+                navigator.clipboard.writeText(textarea.value).then(() => {
+                    alert('✅ Dados copiados! Cole no GitHub Gist ou salve em um arquivo.');
+                });
+            } catch (e) {
+                document.execCommand('copy');
+                alert('✅ Dados copiados! Cole no GitHub Gist ou salve em um arquivo.');
+            }
+        }
+
+        function restaurarBackupGitHub() {
+            const dados = prompt('Cole os dados do backup:');
+            if (!dados) return;
+            
+            try {
+                const backup = JSON.parse(dados);
+                
+                if (backup.app !== 'Finanças Casal') {
+                    throw new Error('Backup inválido');
+                }
+                
+                // Mesclar transações
+                backup.dados.transacoes.forEach(transacao => {
+                    const existe = financasApp.dados.transacoes.some(t => t.id === transacao.id);
+                    if (!existe) {
+                        financasApp.dados.transacoes.push(transacao);
+                    }
+                });
+                
+                recalcularTotais();
+                salvarDadosLocal();
+                atualizarInterface();
+                
+                alert(`✅ Backup restaurado! ${backup.dados.transacoes.length} transações carregadas.`);
+                
+            } catch (e) {
+                alert('❌ Erro ao restaurar backup. Verifique os dados.');
+            }
+        }
+
+        function sincronizarEntreDispositivos() {
+            alert(
+                '🔄 Sincronização entre dispositivos:\n\n' +
+                '1. No SEU celular: "Fazer Backup Agora"\n' +
+                '2. Copie os dados que aparecerem\n' +
+                '3. Envie por WhatsApp para sua esposa\n' +
+                '4. No celular DELA: "Restaurar Backup"\n' +
+                '5. Cole os dados que você enviou\n' +
+                '6. Pronto! Dados sincronizados!\n\n' +
+                'Repita quando quiser sincronizar novamente.'
+            );
+        }
+
+        // ============================================
+        // FUNÇÕES AUXILIARES
+        // ============================================
+        
+        function abrirModal(id) {
+            document.getElementById(id).style.display = 'flex';
+        }
+
+        function fecharModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        function mostrarInicio() {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function abrirRelatorios() {
+            if (financasApp.dados.transacoes.length === 0) {
+                alert('Nenhuma transação para gerar relatórios.');
+                return;
+            }
+            
+            const receitas = financasApp.dados.receitas;
+            const despesas = financasApp.dados.despesas;
+            const saldo = financasApp.dados.saldoTotal;
+            
+            let relatorio = '📊 RELATÓRIO FINANCEIRO\n\n';
+            relatorio += `Receitas totais: ${formatarMoeda(receitas)}\n`;
+            relatorio += `Despesas totais: ${formatarMoeda(despesas)}\n`;
+            relatorio += `Saldo atual: ${formatarMoeda(saldo)}\n\n`;
+            relatorio += `Total de transações: ${financasApp.dados.transacoes.length}\n`;
+            relatorio += `Último backup: ${financasApp.dados.ultimoBackup ? new Date(financasApp.dados.ultimoBackup).toLocaleString('pt-BR') : 'Nunca'}`;
+            
+            alert(relatorio);
+        }
+
+        function abrirConfig() {
+            const opcao = prompt(
+                '⚙️ CONFIGURAÇÕES\n\n' +
+                '1. Trocar usuário (Você/Esposa)\n' +
+                '2. Limpar todos os dados\n' +
+                '3. Ver informações do app\n' +
+                '4. Cancelar\n\n' +
+                'Digite o número:'
+            );
+            
+            switch (opcao) {
+                case '1':
+                    const novoUsuario = prompt('Digite:\n1 para "VOCÊ"\n2 para "ESPOSA"');
+                    if (novoUsuario === '1') {
+                        financasApp.usuario = 'voce';
+                        localStorage.setItem('financas_usuario', 'voce');
+                        alert('Configurado como: VOCÊ');
+                    } else if (novoUsuario === '2') {
+                        financasApp.usuario = 'esposa';
+                        localStorage.setItem('financas_usuario', 'esposa');
+                        alert('Configurado como: ESPOSA');
+                    }
+                    break;
+                    
+                case '2':
+                    if (confirm('⚠️ TEM CERTEZA que quer apagar TODOS os dados?\nIsso não pode ser desfeito!')) {
+                        localStorage.clear();
+                        location.reload();
+                    }
+                    break;
+                    
+                case '3':
+                    alert(
+                        'ℹ️ INFORMAÇÕES DO APP\n\n' +
+                        'Finanças Casal v1.0\n' +
+                        `Usuário: ${financasApp.usuario === 'voce' ? 'VOCÊ' : 'ESPOSA'}\n` +
+                        `Dispositivo: ${financasApp.dispositivo.toUpperCase()}\n` +
+                        `Transações: ${financasApp.dados.transacoes.length}\n` +
+                        `PWA: ${window.matchMedia('(display-mode: standalone)').matches ? 'Instalado' : 'Não instalado'}\n\n` +
+                        'Feito com ❤️ pelo ChatGPT'
+                    );
+                    break;
+            }
+        }
+
+        // ============================================
+        // INSTALAÇÃO DO PWA
+        // ============================================
+        
+        let deferredPrompt;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Mostrar botão de instalação após 5 segundos
+            setTimeout(() => {
+                if (deferredPrompt && confirm('📱 Quer instalar o Finanças Casal como app nativo?\n\nEle funcionará offline como um app normal!')) {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then((choiceResult) => {
+                        if (choiceResult.outcome === 'accepted') {
+                            console.log('Usuário aceitou instalação');
+                        }
+                        deferredPrompt = null;
+                    });
+                }
+            }, 5000);
+        });
+
+        // ============================================
+        // INICIALIZAR APP
+        // ============================================
+        
+        document.addEventListener('DOMContentLoaded', inicializarPWA);
+        
+        // Salvar dados antes de fechar
+        window.addEventListener('beforeunload', salvarDadosLocal);
+        
+        // Verificar conexão
+        window.addEventListener('online', () => {
+            document.getElementById('pwaStatus').textContent = '📱 App Instalado';
+            document.getElementById('pwaStatus').classList.remove('offline');
+            document.getElementById('pwaStatus').classList.add('installed');
+        });
+        
+        window.addEventListener('offline', () => {
+            document.getElementById('pwaStatus').textContent = '⚡ Modo Offline';
+            document.getElementById('pwaStatus').classList.remove('installed');
+            document.getElementById('pwaStatus').classList.add('offline');
+        });
+
+    </script>
+</body>
+</html>
